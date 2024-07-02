@@ -1,16 +1,20 @@
 <?php
 require_once 'upload.php';
 
+$message = '';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])) {
     $uploadResult = uploadAndResizeImage($_FILES["image"]);
 
     if (is_array($uploadResult) && isset($uploadResult['original'], $uploadResult['thumbnail'])) {
-        echo "<h2>Original Image</h2>";
-        echo "<img src='" . $uploadResult['original'] . "' alt='Original Image'><br><br>";
-        echo "<h2>Thumbnail</h2>";
-        echo "<img src='" . $uploadResult['thumbnail'] . "' alt='Thumbnail'><br>";
+        $message = "
+            <h2>Original Image</h2>
+            <img src='{$uploadResult['original']}' alt='Original Image'><br><br>
+            <h2>Thumbnail</h2>
+            <img src='{$uploadResult['thumbnail']}' alt='Thumbnail'><br>
+        ";
     } else {
-        echo "<p>" . $uploadResult . "</p>";
+        $message = "<p>{$uploadResult}</p>";
     }
 }
 ?>
@@ -28,5 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])) {
     <input type="file" name="image" accept="image/*">
     <button type="submit" name="submit">Upload Image</button>
 </form>
+
+<?= $message ?>
 </body>
 </html>
