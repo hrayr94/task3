@@ -1,21 +1,10 @@
 <?php
 require_once 'upload.php';
 
-$message = '';
+$uploadResult = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])) {
     $uploadResult = uploadAndResizeImage($_FILES["image"]);
-
-    if (is_array($uploadResult) && isset($uploadResult['original'], $uploadResult['thumbnail'])) {
-        $message = "
-            <h2>Original Image</h2>
-            <img src='{$uploadResult['original']}' alt='Original Image'><br><br>
-            <h2>Thumbnail</h2>
-            <img src='{$uploadResult['thumbnail']}' alt='Thumbnail'><br>
-        ";
-    } else {
-        $message = "<p>{$uploadResult}</p>";
-    }
 }
 ?>
 
@@ -33,6 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])) {
     <button type="submit" name="submit">Upload Image</button>
 </form>
 
-<?= $message ?>
+<?php if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])): ?>
+    <?php if (is_array($uploadResult) && isset($uploadResult['original'], $uploadResult['thumbnail'])): ?>
+        <h2>Original Image</h2>
+        <img src="<?= $uploadResult['original'] ?>" alt="Original Image"><br><br>
+        <h2>Thumbnail</h2>
+        <img src="<?= $uploadResult['thumbnail'] ?>" alt="Thumbnail"><br>
+    <?php else: ?>
+        <p><?= $uploadResult ?></p>
+    <?php endif; ?>
+<?php endif; ?>
 </body>
 </html>
