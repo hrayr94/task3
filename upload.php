@@ -1,36 +1,30 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"]["name"])) {
-    $target_dir = "uploads/";
-    $target_file = $target_dir . basename($_FILES["image"]["name"]);
+function uploadAndResizeImage($file) {
+    $target_dir = 'uploads/';
+    $target_file = $target_dir . basename($file['name']);
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-    $check = getimagesize($_FILES["image"]["tmp_name"]);
+    $check = getimagesize($file['tmp_name']);
     if($check !== false) {
-        echo "File is an image - " . $check["mime"] . ".";
         $uploadOk = 1;
     } else {
-        echo "File is not an image.";
-        $uploadOk = 0;
+        return 'File is not an image.';
     }
 
-    if ($_FILES["image"]["size"] > 500000) {
-        echo "Sorry, your file is too large.";
-        $uploadOk = 0;
+    if ($file['size'] > 500000) {
+        return 'Sorry, your file is too large.';
     }
 
-    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-        && $imageFileType != "gif" ) {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-        $uploadOk = 0;
+    if($imageFileType != 'jpg' && $imageFileType != 'png' && $imageFileType != 'jpeg'
+        && $imageFileType != 'gif' ) {
+        return 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.';
     }
 
     if ($uploadOk == 0) {
-        echo "Sorry, your file was not uploaded.";
+        return 'Sorry, your file was not uploaded.';
     } else {
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-            echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
-
+        if (move_uploaded_file($file['tmp_name'], $target_file)) {
             // Resize image
             $thumbnail_width = 150;
             $thumbnail_height = 150;
@@ -46,20 +40,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"]["name"])) {
             }
 
             $image_p = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
-            $image = imagecreatefromjpeg($target_file); // Use imagecreatefrompng() if PNG
+            $image = imagecreatefromjpeg($target_file);
             imagecopyresampled($image_p, $image, 0, 0, 0, 0, $thumbnail_width, $thumbnail_height, $width_orig, $height_orig);
 
-            $thumbnail_filename = $target_dir . "thumbnail_" . basename($_FILES["image"]["name"]);
-            imagejpeg($image_p, $thumbnail_filename); // Use imagepng() for PNG
+            $thumbnail_filename = $target_dir . 'thumbnail_' . basename($file['name']);
+            imagejpeg($image_p, $thumbnail_filename);
 
+            ob_start();
             echo "<h2>Original Image</h2>";
             echo "<img src='$target_file' alt='Original Image'><br><br>";
             echo "<h2>Thumbnail</h2>";
-            echo "<img src='$thumbnail_filename' alt='Thumbnail'>";
+            echo "<img src='$thumbnail_filename' alt='Thumbnail'><br>";
+            $output = ob_get_clean();
 
             imagedestroy($image_p);
+            return $output;
         } else {
-            echo "Sorry, there was an error uploading your file.";
+            return 'Sorry, there was an error uploading your file.';
         }
     }
 }

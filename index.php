@@ -7,9 +7,20 @@
 </head>
 <body>
 <h2>Upload an Image</h2>
-<form action="upload.php" method="post" enctype="multipart/form-data">
+<form action="index.php" method="post" enctype="multipart/form-data">
     <input type="file" name="image" accept="image/*">
     <button type="submit" name="submit">Upload Image</button>
 </form>
+
+<?php
+require_once 'upload.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])) {
+    $uploadResult = uploadAndResizeImage($_FILES['image']);
+
+    echo "<h3>Upload Result:</h3>";
+    echo $uploadResult;
+}
+?>
 </body>
 </html>
