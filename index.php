@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])) {
     echo "<h3>Upload Result:</h3>";
     echo $uploadResult;
 }
+
 ?>
 </body>
 </html>
