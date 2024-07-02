@@ -6,9 +6,7 @@ function uploadAndResizeImage($file) {
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
     $check = getimagesize($file['tmp_name']);
-    if($check !== false) {
-        $uploadOk = 1;
-    } else {
+    if($check === false) {
         return 'File is not an image.';
     }
 
@@ -16,8 +14,7 @@ function uploadAndResizeImage($file) {
         return 'Sorry, your file is too large.';
     }
 
-    if($imageFileType != 'jpg' && $imageFileType != 'png' && $imageFileType != 'jpeg'
-        && $imageFileType != 'gif' ) {
+    if(!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
         return 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.';
     }
 
@@ -29,7 +26,6 @@ function uploadAndResizeImage($file) {
             $thumbnail_width = 150;
             $thumbnail_height = 150;
 
-            // Get new dimensions
             list($width_orig, $height_orig) = getimagesize($target_file);
             $ratio_orig = $width_orig / $height_orig;
 
@@ -46,17 +42,17 @@ function uploadAndResizeImage($file) {
             $thumbnail_filename = $target_dir . 'thumbnail_' . basename($file['name']);
             imagejpeg($image_p, $thumbnail_filename);
 
-            ob_start();
-            echo "<h2>Original Image</h2>";
-            echo "<img src='$target_file' alt='Original Image'><br><br>";
-            echo "<h2>Thumbnail</h2>";
-            echo "<img src='$thumbnail_filename' alt='Thumbnail'><br>";
-            $output = ob_get_clean();
-
             imagedestroy($image_p);
+
+            $output = [
+                'original' => $target_file,
+                'thumbnail' => $thumbnail_filename
+            ];
+
             return $output;
         } else {
             return 'Sorry, there was an error uploading your file.';
         }
     }
 }
+?>

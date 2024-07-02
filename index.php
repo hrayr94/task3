@@ -1,3 +1,20 @@
+<?php
+require_once 'upload.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])) {
+    $uploadResult = uploadAndResizeImage($_FILES["image"]);
+
+    if (is_array($uploadResult) && isset($uploadResult['original'], $uploadResult['thumbnail'])) {
+        echo "<h2>Original Image</h2>";
+        echo "<img src='" . $uploadResult['original'] . "' alt='Original Image'><br><br>";
+        echo "<h2>Thumbnail</h2>";
+        echo "<img src='" . $uploadResult['thumbnail'] . "' alt='Thumbnail'><br>";
+    } else {
+        echo "<p>" . $uploadResult . "</p>";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,17 +28,5 @@
     <input type="file" name="image" accept="image/*">
     <button type="submit" name="submit">Upload Image</button>
 </form>
-
-<?php
-require_once 'upload.php';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['name'])) {
-    $uploadResult = uploadAndResizeImage($_FILES['image']);
-
-    echo "<h3>Upload Result:</h3>";
-    echo $uploadResult;
-}
-
-?>
 </body>
 </html>
